@@ -6,7 +6,7 @@ import rigoImage from "../../img/rigo-baby.jpg";
 //create your first component
 const Home = () => {
 
-	const [myuser, setMyUser] = useState("oscar");
+	const [myuser, setMyUser] = useState("Dylan");
 	const [list, setList] = useState({});
 	const [newTask, setnewTask] = useState("")
 	const url = 'https://playground.4geeks.com/todo'
@@ -15,12 +15,14 @@ const Home = () => {
 
 		try {
 			const resp = await fetch(url + '/users/' + myuser);
-
+			console.log("Status GET:", resp.status);
 			if (!resp.ok) { throw new Error }
 			const data = await resp.json();
 			return setList(data)
 
 		} catch (error) {
+			console.error("Falló getUser, intentando crear...");
+			// 			
 			createUser()
 		}
 
@@ -112,9 +114,10 @@ const Home = () => {
 
 		}
 	}
-    const handleDone=async({label,is_done,id})=>{
-		const formdata={label,
-			            is_done: !is_done
+	const handleDone = async ({ label, is_done, id }) => {
+		const formdata = {
+			label,
+			is_done: !is_done
 
 		}
 		try {
@@ -137,7 +140,7 @@ const Home = () => {
 
 
 
-	}
+		}
 	}
 	useEffect(() => {
 
@@ -148,50 +151,65 @@ const Home = () => {
 
 
 
-
+	// console.log(list)
 
 	return (
-		<div className="text-center">
-
-			<h1 className="text-center mt-5"> lista de tareas  de {list.name} </h1>
-
-
-			<form className="mt-5" onSubmit={handleSubmit} >
-
-				<input type="text" value={newTask} onChange={handleChange} />
-
-				<input type="submit" value="enviar" />
+		<div className="container mt-5">
+			<div className="row justify-content-center">
+				<div className="col-md-6">
 
 
 
+					<h1 className="text-center mb-4"> Lista de tareas de  <span className="text-primay"> {list.name} </span>
+
+					</h1>
+
+
+					<form className="input-group mb-4" onSubmit={handleSubmit} >
+
+						<input className="form-control" type="text" placeholder="añadir nueva tarea" value={newTask} onChange={handleChange}
+
+						/>
+
+						<button className="btn btn-primary" type="submit" >
+							<i className="fa-solid fa-plus"></i> Añadir
+						</button>
+					</form>
+
+					<ul className="list-group shadow-sm">
+
+						{
+						list.todos?.length===0 ?
+						<li className="list-group-item">No tienes tareas pendientes</li> 
+						:
+						list.todos?.map(el => <li key={el.id} className={`list-group-item d-flex justify-content-between ${el.is_done ? 'text-decoration-line-through' : 'border'}`}> {el.label}
+							<div >
+								<button className="btn btn-danger me-2" onClick={() => handleDelete(el.id)}>
+									<span className="fa-regular fa-trash-can ">
+									</span>
+
+								</button>
+								<button className={`btn btn-outline-${!el.is_done? 'success':'danger'} `} 
+								onClick={() => handleDone(el)}>
+									<span className={`fa-solid ${el.is_done ? 'fa-xmark' : 'fa-check'}`}></span>
+								</button>
+							</div>
+
+						</li>)}
+
+					</ul>
 
 
 
 
-			</form>
 
 
 
 
 
+				</div>
 
-			<ul>
-
-				{list.todos?.map(el => <li key={el.id} className= {el.is_done? 'bg-success': 'border'}> {el.label} <span className="fa-regular fa-trash-can" onClick={() => handleDelete(el.id)}>
-					</span>
-					<span className={`fa-solid ${el.is_done?'fa-xmark': 'fa-check' }`} onClick={() => handleDone(el)}></span> </li>)}
-
-			</ul>
-
-
-
-
-
-
-
-
-
-
+			</div>
 
 		</div>
 	);
